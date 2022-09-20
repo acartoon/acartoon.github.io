@@ -25,7 +25,27 @@
     border: 1px solid rgba(42,47,65,.15);
     background: #d9edf7;
     padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
+.accordion-arrow {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+    background: url("arrow.svg");
+    background-position: center;
+    background-size: contain;
+    transition: transform 250ms ease-in;
+}
+
+
+.hide .accordion-arrow {
+    transform: rotate(180deg);
+    transition: transform 250ms ease-in;
+}
+
 
 .accordion-title {
     margin: 0;
@@ -109,6 +129,8 @@ input.count {
     margin: 0;
     border: none;
     color: inherit;
+    font-size: 17px;
+    line-height: 32px;
 }
 
 .price-name {

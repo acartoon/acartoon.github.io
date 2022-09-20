@@ -114,7 +114,9 @@ function createHead(text) {
     var head = createElement({tag: 'div', className: 'accordion-head'});
     head.classList.add('js-accordion-head');
     var title = createElement({tag: 'h4', className: 'accordion-title', text: text});
+    var arrow = createElement({tag: 'span', className: 'accordion-arrow'});
     head.append(title);
+    head.append(arrow);
     return head;
 }
 
