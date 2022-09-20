@@ -42,7 +42,8 @@ function renderInput() {
     count.setAttribute('type', 'number');
     count.setAttribute('min', '0');
     count.placeholder = 1;
-    return addWrapper(count);
+    count.value = 1;
+    return count;
 }
 
 function renderCheckbox() {
@@ -86,7 +87,7 @@ function renderPriceElement(node, data) {
 
     wrapper.append(addWrapper(checkbox));
     wrapper.append(name);
-    wrapper.append(count);
+    wrapper.append(addWrapper(count));
     wrapper.append(price);
     wrapper.append(addWrapper(total));
 
@@ -140,6 +141,7 @@ function renderPrice(price) {
     })
 }
 function onChangeCheckbox({event, total, data, count}) {
+    console.log(count);
     var checkbox = event.target;
     var checked = event.target.checked;
     total.innerHTML = data.price;
@@ -150,6 +152,7 @@ function onChangeCheckbox({event, total, data, count}) {
     if(!checked) {
         if(index === -1) return;
         checkbox.checked = false;
+
 
         checkedList = [...checkedList.slice(0, index), ...checkedList.slice(index + 1)];
         updateTotalBlock(checkedList);
