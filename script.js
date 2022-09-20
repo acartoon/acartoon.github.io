@@ -1,4 +1,5 @@
 var checkedList = [];
+var HIDE_CLASS = 'hide';
 
 function fetchPrice() {
     return axios.get('./data.json').then((response) => {
@@ -21,10 +22,14 @@ function formattedPrice(response) {
     }, {})
 }
 
-function addWrapper(node) {
-    var wrapper = createElement({tag: 'div', className: 'price-column'});
+function createWrapper(node, className) {
+    var wrapper = createElement({tag: 'div', className: className});
     wrapper.append(node);
     return wrapper;
+}
+
+function addWrapper(node) {
+    return createWrapper(node, 'price-column');
 }
 
 function createElement({tag, className, text}) {
@@ -66,12 +71,23 @@ function renderName(text) {
 function renderPriceElement(node, data) {
     var wrapper = createElement({tag: 'div', className: 'price-row'});
 
+
+
+
     var price = renderPriceItem(data.price);
     var total = createElement({tag: 'p', className: 'js-price-total', text: data.price});
     total.classList.add('price-total');
     var count = renderInput(total);
     var checkbox = renderCheckbox();
     var name = renderName(data.name);
+
+    wrapper.addEventListener('click', function (e) {
+        var test = e.target;
+        if(test.classList.contains('js-count')) return;
+        if(test.classList.contains('js-checkbox')) return;
+
+        updateCheckedState(!checkbox.checked, checkbox, data, count);
+    })
 
     checkbox.addEventListener('change', function (e) {
         onChangeCheckbox({event: e, total: total, data: data, count});
@@ -97,7 +113,7 @@ function renderPriceElement(node, data) {
 function createHead(text) {
     var head = createElement({tag: 'div', className: 'accordion-head'});
     head.classList.add('js-accordion-head');
-    var title = createElement({tag: 'h4', className: 'accordion-head', text: text});
+    var title = createElement({tag: 'h4', className: 'accordion-title', text: text});
     head.append(title);
     return head;
 }
@@ -134,20 +150,23 @@ function renderPrice(price) {
         accordion.append(body);
 
         head.addEventListener('click', function () {
-            body.classList.toggle('hide');
+            accordion.classList.toggle(HIDE_CLASS);
         })
 
-        parent.append(accordion);
+        parent.append(createWrapper(accordion, 'accordion-wrapper'));
     })
 }
+
 function onChangeCheckbox({event, total, data, count}) {
-    console.log(count);
     var checkbox = event.target;
     var checked = event.target.checked;
     total.innerHTML = data.price;
-    count.value = 1;
+    updateCheckedState(checked, checkbox, data, count);
+}
 
+function updateCheckedState(checked, checkbox, data, count) {
     var index = checkedList.findIndex(i => i.id === data.id);
+    count.value = 1;
 
     if(!checked) {
         if(index === -1) return;
@@ -193,6 +212,15 @@ function changeCount(e, totalBlock, checkbox, price, data) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    var buttonOpen = document.querySelector('.js-open');
+    var buttonClose = document.querySelector('.js-close');
+
+    changeStateAccordion(buttonOpen, function (item) {
+        item.classList.remove(HIDE_CLASS)
+    })
+    changeStateAccordion(buttonClose, function (item) {
+        item.classList.add(HIDE_CLASS)
+    })
     fetchPrice().then((response) => {
         var formatted = formattedPrice(response)
         renderPrice(formatted);
@@ -203,6 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function createTotalElement(item) {
     var wrapper = createElement({tag: 'div', className: 'price-total'});
     wrapper.classList.add('price-row');
+
     var title = createElement({tag: 'div', className: 'price-total-name'});
     title.classList.add('price-column');
     title.innerText = item.name;
@@ -225,16 +254,32 @@ function updateTotalBlock(checkedList) {
     var count = 0;
     var total = 0;
     if(checkedList.length === 0) return;
-    var head = createTotalElement({name: 'Услуга', count: 'Выбранное кол-во', total: 'Итого:'});
-    parent.append(head);
+    var table = createElement({tag: 'div', className: 'price-total'});
+    table.classList.add('price-table');
+
+
+    var title = createElement({tag: 'p', className: 'price-total-title', text: 'Выбранные позиции'});
+
+    var head = createTotalElement({name: 'Услуга', count: 'Выбранное кол-во', total: 'Итого'});
+    table.append(head);
     checkedList.forEach(function (item) {
         count += item.count;
         total += item.count * item.price;
 
         var i = createTotalElement(item);
-        parent.append(i);
+        table.append(i);
     })
     var footer = createTotalElement({name: 'ИТОГО', count: count, total: total});
-    parent.append(footer);
+    table.append(footer);
 
+    parent.append(title);
+    parent.append(table);
+
+}
+
+function changeStateAccordion(button, cb) {
+    button.addEventListener('click', function () {
+        var acc = document.querySelectorAll('.accordion');
+        acc.forEach(cb)
+    })
 }

@@ -9,14 +9,22 @@
     <title>Document</title>
 </head>
 <body>
-    <div id="qodef-page-inner" class="qodef-content-grid">
+    <div id="qodef-page-inner" class="qodef-content-grid base-price">
         <h1 class="qodef-e-title entry-title">Прейскурант</h1>
         <div class="price-grid">
             <div id="table" class="price-table-wrapper">
+                <div class="base-price-button-wrapper">
+                    <button class="base-price-button js-close">свернуть все</button>
+                    <button class="base-price-button js-open">развернуть все</button>
+                </div>
             </div>
             <div  class="price-table-total">
-                <div id="total" class="price-table table-total"></div>
+                <div id="total" class="table-total">
+                </div>
             </div>
+        </div>
+        <div class="base-price-link-wrapper">
+            <a class="base-price-link" href="price.xlsx">Скачать полный прайс</a>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
