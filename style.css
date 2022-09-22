@@ -34,6 +34,7 @@
     width: 24px;
     height: 24px;
     flex: 0 0 auto;
+    margin-right: 10px;
     background: url("arrow.svg");
     background-position: center;
     background-size: contain;
@@ -49,6 +50,7 @@
 
 .accordion-title {
     margin: 0;
+    margin-right: auto;
     font-size: 17px;
     line-height: 20px;
     font-weight: 700;
@@ -131,22 +133,30 @@ input.count {
     color: inherit;
     font-size: 17px;
     line-height: 32px;
+    opacity: 1;
+    text-align: center;
+}
+
+input.count::-webkit-outer-spin-button,
+input.count::-webkit-inner-spin-button {
+    -webkit-appearance: square-button;
+    opacity: 1;
 }
 
 .price-name {
     margin: 0;
 }
 
-.table-total {
-    position: sticky;
-    top: 25px;
-}
 .price-total {
     margin: 0;
 }
 
 .price-total.price-row:last-child .price-column {
     font-weight: 700;
+}
+
+.hide-last .price-column:last-child {
+    display: none;
 }
 
 .price-price {
@@ -174,7 +184,6 @@ input.count {
 
 @media(min-width: 992px) {
     .accordion-title {
-        margin: 0;
         font-size: 20px;
         line-height: 32px;
     }
@@ -205,18 +214,18 @@ input.count {
 }
 
 .base-price-button {
-    background: #d9edf7;
+    background: #017bb9;
     padding: 8px 15px;
     border: none;
+    color: #fff;
     font-size: 14px;
     line-height: 22px;
-    color: #000;
     transition: background 250ms ease;
     cursor: pointer;
 }
 
 .base-price-button:hover {
-    background: #c6dfeb;
+    background: #017bb9;
     transition: background 250ms ease;
 }
 
@@ -229,4 +238,15 @@ input.count {
     font-size: 18px;
     line-height: 32px;
 }
+.add-all {
+    cursor: pointer;
+    background: #017bb9;
+    color: #ffff;
+    border: none;
+    padding: 8px;
+}
 
+.add-all:hover {
+    background: #017bb9;
+    transition: background 250ms ease;
+}
