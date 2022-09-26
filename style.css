@@ -103,11 +103,15 @@
     border-bottom: 1px solid rgba(42,47,65,.15);
     vertical-align: bottom;
     cursor: pointer;
+    min-width: 70px;
 }
 .price-column:first-child {
     vertical-align: middle;
 }
 
+.price-column:first-child {
+    min-width: inherit;
+}
 .price-row:last-child .price-column {
     border-bottom: 0;
 }
@@ -196,13 +200,28 @@ input.count::-webkit-inner-spin-button {
         flex: 0 0 auto;
     }
     .price-table-total {
+        position: sticky;
+        top: 20px;
         width: 40%;
         flex: 0 0 auto;
-        overflow: inherit;
+        height: 80vh;
+        overflow: hidden;
+        display: flex;
+    }
+
+    .table-total {
+        display: flex;
+        flex-direction: column;
     }
 
     .price-total-name {
         width: auto;
+    }
+
+    .price-total-wrapper {
+        flex-direction: column;
+        display: flex;
+        overflow: auto;
     }
 }
 

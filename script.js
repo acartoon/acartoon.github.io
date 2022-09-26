@@ -116,14 +116,14 @@ function renderAccordion(title, stop) {
 }
 
 function renderItem(title, data, updateChecked) {
-    var ADD_TEXT = 'Добавить все';
+    // var ADD_TEXT = 'Добавить все';
     var values = data;
     var dom = {};
 
     return {
-        updateDom(element) {
+        updateDom(element, reset) {
             var id = element.id;
-            dom[id].count.value = element.count;
+            dom[id].count.value = reset ? 1 : element.count;
             dom[id].checkbox.checked = element.checked;
         },
 
@@ -133,10 +133,10 @@ function renderItem(title, data, updateChecked) {
         },
 
 
-        update(count, value) {
+        update(count, value, reset) {
             var index = values.findIndex(i => i.id === value.id);
             this.updateData(index, count);
-            this.updateDom(values[index]);
+            this.updateDom(values[index], reset);
             this.updateButtonName();
             var checked = values.filter((i) => i.checked);
             updateChecked(checked);
@@ -149,6 +149,22 @@ function renderItem(title, data, updateChecked) {
         renderAccordion: function () {
             var accordion = renderAccordion(title, this.stop);
             return accordion.init();
+        },
+        renderHeader() {
+            var wrapper = createElement({tag: 'div', className: 'price-row'});
+            var checkbox = createElement({tag: 'div', className: 'price-column'});
+            var title = createElement({tag: 'div', className: 'price-column', text: 'Услуга' });
+            var count = createElement({tag: 'div', className: 'price-column', text: 'Кол-во'});
+            var price = createElement({tag: 'div', className: 'price-column', text: 'Цена, ₽'});
+            var total = createElement({tag: 'div', className: 'price-column', text: 'Итого'});
+
+            wrapper.append(checkbox);
+            wrapper.append(title);
+            wrapper.append(count);
+            wrapper.append(price);
+            wrapper.append(total);
+            return wrapper;
+
         },
         renderItem(value, table) {
             var element = renderPriceElement(value);
@@ -181,6 +197,7 @@ function renderItem(title, data, updateChecked) {
             var table = createElement({tag: 'div', className: 'price-table'});
             table.classList.add('hide-last');
             var _this = this;
+            table.append(this.renderHeader())
             values.forEach(function (value) {
                 _this.renderItem(value, table);
             })
@@ -191,33 +208,38 @@ function renderItem(title, data, updateChecked) {
         },
 
         updateButtonName: function () {
-            this.button.innerText = this.checkedAll() ? 'Удалить все' : ADD_TEXT;
+            // this.button.innerText = this.checkedAll() ? 'Удалить все' : ADD_TEXT;
         },
 
-        initButton: function () {
-            var button = createElement({tag: 'button', className: 'js-add-all', text: ADD_TEXT});
-            button.classList.add('add-all')
+        resetAll: function () {
             var _this = this;
-
-            button.addEventListener('click', function () {
-                var checked = _this.checkedAll();
-                console.log(checked);
-                values.forEach(function (value) {
-                    var currentCount = value.count !== 0 ? value.count : 1
-                    var count = checked ? 0 : currentCount;
-                    _this.update(count, value);
-                })
-            });
-
-            return button;
+            values.forEach(function (value) {
+              _this.update(0, value, true);
+          })
         },
+
+        // initButton: function () {
+        //     var button = createElement({tag: 'button', className: 'js-add-all', text: ADD_TEXT});
+        //     button.classList.add('add-all')
+        //     var _this = this;
+        //
+        //     button.addEventListener('click', function () {
+        //         var checked = _this.checkedAll();
+        //         values.forEach(function (value) {
+        //             var currentCount = value.count !== 0 ? value.count : 1
+        //             var count = checked ? 0 : currentCount;
+        //             _this.update(count, value);
+        //         })
+        //     });
+        //     return button;
+        // },
 
         init: function () {
             var { accordion, head, body } = this.renderAccordion();
             var table = this.createTable()
             body.append(table);
-            this.button = this.initButton(body);
-            head.append(this.button);
+            // this.button = this.initButton(body);
+            // head.append(this.button);
             return accordion;
         }
     }
@@ -232,6 +254,7 @@ function fetchPrice() {
 
 function renderPrice(price) {
     var selectedPrice = {};
+    var resetAll = []
 
     return {
         stop: function (target) {
@@ -283,13 +306,14 @@ function renderPrice(price) {
 
 
             var title = createElement({tag: 'p', className: 'price-total-title', text: 'Выбранные позиции'});
+            var wrapper = createElement({tag: 'p', className: 'price-total-wrapper'});
 
             var head = this.createTotalElement({name: 'Услуга', count: 'Выбранное кол-во', total: 'Итого'});
             table.append(head);
 
             selectedList.forEach(function (item) {
-                count += item.count;
-                total += item.count * item.price;
+                count += Number(item.count);
+                total += Number(item.count) * Number(item.price);
 
                 var i = _this.createTotalElement(item);
                 table.append(i);
@@ -298,7 +322,15 @@ function renderPrice(price) {
             table.append(footer);
 
             parent.append(title);
-            parent.append(table);
+            parent.append(wrapper);
+            wrapper.append(table);
+            parent.append(wrapper);
+        },
+        reset: function () {
+            if(resetAll.length < 1) return;
+            resetAll.forEach(function (reset) {
+                reset();
+            })
         },
 
         init: function (app) {
@@ -311,6 +343,7 @@ function renderPrice(price) {
                 }
                 var item = renderItem(key, values, update);
                 var accordion = item.init();
+                resetAll.push(item.resetAll.bind(item))
                 app.append(createWrapper(accordion, 'accordion-wrapper'));
             })
         }
@@ -321,6 +354,7 @@ function renderPrice(price) {
 document.addEventListener('DOMContentLoaded', function () {
     var buttonOpen = document.querySelector('.js-open');
     var buttonClose = document.querySelector('.js-close');
+    var buttonReset = document.querySelector('.js-removeAll');
 
     changeStateAccordion(buttonOpen, function (item) {
         item.classList.remove(HIDE_CLASS)
@@ -334,6 +368,11 @@ document.addEventListener('DOMContentLoaded', function () {
         var app = document.querySelector('#table');
         var initPrice = renderPrice(formatted);
         initPrice.init(app);
+
+        buttonReset.addEventListener('click', function () {
+            initPrice.reset()
+        })
+
     })
 })
 
