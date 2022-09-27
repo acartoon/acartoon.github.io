@@ -155,7 +155,7 @@ function renderItem(title, data, updateChecked) {
             var checkbox = createElement({tag: 'div', className: 'price-column'});
             var title = createElement({tag: 'div', className: 'price-column', text: 'Услуга' });
             var count = createElement({tag: 'div', className: 'price-column', text: 'Кол-во'});
-            var price = createElement({tag: 'div', className: 'price-column', text: 'Цена, ₽'});
+            var price = createElement({tag: 'div', className: 'price-column', text: 'Цена за ед., ₽'});
             var total = createElement({tag: 'div', className: 'price-column', text: 'Итого'});
 
             wrapper.append(checkbox);
@@ -278,7 +278,7 @@ function renderPrice(price) {
             count.innerText = item.count;
             var total = createElement({tag: 'div', className: 'price-total-total'});
             total.classList.add('price-column');
-            total.innerText = item.total ?? item.count * item.price;
+            total.innerText = (item.total ?? item.count * item.price) + ' ₽';
 
             wrapper.append(title)
             wrapper.append(count)
@@ -308,7 +308,7 @@ function renderPrice(price) {
             var title = createElement({tag: 'p', className: 'price-total-title', text: 'Выбранные позиции'});
             var wrapper = createElement({tag: 'p', className: 'price-total-wrapper'});
 
-            var head = this.createTotalElement({name: 'Услуга', count: 'Выбранное кол-во', total: 'Итого'});
+            var head = this.createTotalElement({name: 'Услуга', count: 'Выбрано услуг', total: 'Итого'});
             table.append(head);
 
             selectedList.forEach(function (item) {
