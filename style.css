@@ -243,7 +243,13 @@ input.count::-webkit-inner-spin-button {
     cursor: pointer;
 }
 
-.base-price-button:hover {
+.base-price-button[disabled] {
+    background: #73797c;
+    cursor: default;
+    transition: background 250ms ease;
+}
+
+.base-price-button:not([disabled]):hover {
     background: #017bb9;
     transition: background 250ms ease;
 }

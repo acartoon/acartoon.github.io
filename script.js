@@ -1,4 +1,120 @@
 var HIDE_CLASS = 'hide';
+var totalData = [];
+
+var buttonToPrint = document.querySelectorAll('.js-print');
+var buttonToSave = document.querySelectorAll('.js-save');
+var buttonForm = document.querySelector('.js-form button[type="submit"]');
+
+// сохранить документ
+buttonToSave.forEach(function (item) {
+    item.addEventListener('click', function () {
+        downloadFile();
+    })
+})
+
+function downloadFile__() {
+    var elHtml = document.getElementById('total').innerHTML;
+    var link = document.createElement('a');
+    link.setAttribute('download', 'test.doc');
+    link.setAttribute('href', 'data:' + 'text/doc' + ';charset=utf-8,' + encodeURIComponent(createDocumentContent()));
+    link.click();
+}
+
+function downloadFile() {
+    console.log(createDocumentContent().innerHTML);
+    //var htmlDoc = document.getElementById('total').innerHTML;
+    // console.log(htmlDoc)
+    var converted = htmlDocx.asBlob(createDocumentContent().innerHTML);
+    saveAs(converted, 'Выбранные позиции.docx');
+}
+
+function downloadFile_() {
+    console.log(createDocumentContent());
+    var htmlDoc = document.getElementById('total').innerHTML;
+    var converted = htmlDocx.asBlob(htmlDoc);
+    saveAs(converted, 'test.docx');
+}
+
+// распечатка документа
+function changeStateButton(button, state) {
+    if (state) {
+        button.removeAttribute('disabled');
+    } else {
+        button.setAttribute('disabled', 'true');
+    }
+}
+function updateState(totalBlock) {
+    totalData = totalBlock;
+    buttonToPrint.forEach(function (item) {
+        changeStateButton(item, totalBlock.length > 0)
+    })
+
+    buttonToSave.forEach(function (item) {
+        changeStateButton(item, totalBlock.length > 0)
+    })
+
+    buttonToSave.forEach(function (item) {
+        changeStateButton(item, totalBlock.length > 0)
+    })
+
+    changeStateButton(buttonForm, totalBlock.length > 0)
+}
+
+
+function createDocumentContent() {
+    var parent = createElement({tag: 'div', className: ''})
+    var title = createElement({tag: 'div', text: 'Выбранные позиции:'})
+    //  name: 'Аппарат для непрерывной, пассивной разработки локтевого сустава (30 минут)', price: 350, checked: true, count: 1
+    parent.append(title)
+    totalData.forEach(function (item) {
+        var element = createElement({tag: 'div', className: '', text: item.name + ' по цене ' + item.price + '₽, количество: ' + item.count})
+        parent.append(element)
+    })
+    return parent;
+}
+
+function createDocumentContentForSend() {
+    return totalData.reduce(function (acc, item) {
+        acc = acc + item.name + ' по цене ' + item.price + '₽, количество: ' + item.count + '\\n';
+        return acc;
+    }, '')
+}
+
+
+var formForSend = document.querySelector('.js-form');
+
+formForSend.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    if(totalData.length < 1) {
+        return;
+    }
+    var data = [];
+    var fields = formForSend.querySelectorAll('input');
+    var selectedData = createDocumentContentForSend();
+})
+
+
+function CallPrint(strid) {
+    var prtContent = document.getElementById(strid);
+    var prtCSS = '<link rel="stylesheet" href="/style.css" type="text/css" />';
+    var WinPrint = window.open('','','left=50,top=50,width=800,height=640,toolbar=0,scrollbars=1,status=0');
+    WinPrint.document.write('<div id="print" class="contentpane">');
+    WinPrint.document.write(prtCSS);
+    WinPrint.document.write(prtContent.innerHTML);
+    WinPrint.document.write('</div>');
+    WinPrint.document.close();
+    WinPrint.focus();
+    WinPrint.print();
+}
+
+
+buttonToPrint.forEach(function (item) {
+    item.addEventListener('click', function () {
+        CallPrint('total')
+    })
+})
+
+// распечатка документа
 
 function createWrapper(node, className) {
     var wrapper = createElement({tag: 'div', className: className});
@@ -70,7 +186,9 @@ function renderPriceElement(data) {
 
 function createElement({tag, className, text}) {
     var node = document.createElement(tag);
-    node.classList.add(className);
+    if(className && className !== '') {
+        node.classList.add(className);
+    }
     if(text) {
         node.innerText = text
     }
@@ -252,7 +370,7 @@ function fetchPrice() {
     })
 }
 
-function renderPrice(price) {
+function renderPrice(price, cb) {
     var selectedPrice = {};
     var resetAll = []
 
@@ -264,6 +382,7 @@ function renderPrice(price) {
         updateChecked: function(values, id) {
             selectedPrice[id] = values;
             this.renderTotalBlock();
+
         },
 
         createTotalElement: function (item) {
@@ -300,6 +419,8 @@ function renderPrice(price) {
             parent.innerHTML = '';
             var count = 0;
             var total = 0;
+            // выполняются обработчики при обновлении блока
+            cb(selectedList);
             if(selectedList.length === 0) return;
             var table = createElement({tag: 'div', className: 'price-total'});
             table.classList.add('price-table');
@@ -366,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchPrice().then((response) => {
         var formatted = formattedPrice(response);
         var app = document.querySelector('#table');
-        var initPrice = renderPrice(formatted);
+        var initPrice = renderPrice(formatted, updateState);
         initPrice.init(app);
 
         buttonReset.addEventListener('click', function () {

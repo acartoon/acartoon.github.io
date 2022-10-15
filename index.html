@@ -14,6 +14,8 @@
         <div class="price-grid">
             <div id="table" class="price-table-wrapper">
                 <div class="base-price-button-wrapper">
+                    <button class="base-price-button js-print" disabled>распечатать результат</button>
+                    <button class="base-price-button js-save" disabled>сохранить</button>
                     <button class="base-price-button js-close">свернуть все</button>
                     <button class="base-price-button js-open">развернуть все</button>
                     <button class="base-price-button js-removeAll">Сбросить </button>
@@ -27,8 +29,25 @@
         <div class="base-price-link-wrapper">
             <a class="base-price-link" href="price.xlsx">Скачать полный прайс</a>
         </div>
+        <div class="base-price-link-wrapper">
+            <button class="base-price-button js-print" disabled>распечатать результат</button>
+            <button class="base-price-button js-save" disabled>сохранить</button>
+        </div>
+
+        <div class="form-wrapper">
+            <form action="" class="js-form">
+                <h3>Отправить на почту</h3>
+                <label for="email">
+                    <input id="email" type="text" placeholder="Введите email"/>
+                    <button type="submit" disabled>Отправить</button>
+                </label>
+
+            </form>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="fileSaver.min.js"></script>
+    <script src="html-docx.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
