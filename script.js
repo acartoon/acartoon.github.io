@@ -80,17 +80,61 @@ function createDocumentContentForSend() {
     }, '')
 }
 
+function createTable(data) {
+    var table =  createElement({tag: 'table', className: 'table'});
+    var total = 0;
+    data.forEach(function (el) {
+        total += el.count * el.price;
+        var tr =  createElement({tag: 'td', className: 'tr'});
+        [el.name, el.count, el.price, (el.count * el.price)].forEach(function (i) {
+            var td =  createElement({tag: 'td', className: 'td', text: i});
+            tr.append(td)
+        });
+        table.append(tr);
+    })
 
-var formForSend = document.querySelector('.js-form');
+    var tr2 =  createElement({tag: 'td', className: 'tr'});
+    var td =  createElement({tag: 'td', className: 'tr', text: 'Итого:'});
+    td.setAttribute('colspan', 3);
+    var td2 =  createElement({tag: 'td', className: 'tr', text: total});
 
-formForSend.addEventListener('submit', function (evt) {
+    tr2.append(td);
+    tr2.append(td2);
+    table.append(tr2);
+    console.log(table);
+    return table;
+}
+
+axios.defaults.withCredentials = true;
+var form = document.querySelector('.js-form');
+var formForSend = form.querySelector('.js-form button');
+formForSend.addEventListener('click', function (evt) {
     evt.preventDefault();
     if(totalData.length < 1) {
         return;
     }
-    var data = [];
-    var fields = formForSend.querySelectorAll('input');
-    var selectedData = createDocumentContentForSend();
+
+    var fio = form.querySelector('input[name="fio"]').value;
+    var phone = form.querySelector('input[name="phone"]').value;
+    var email = form.querySelector('input[name="email"]').value;
+
+    var error = document.querySelector('.js-error')
+    if(!fio || !phone || !email) {
+        error.classList.remove('hidden');
+        return;
+    } else {
+        error.classList.add('hidden');
+    }
+
+    axios.post('https://rehabmir.ru/calc/send.php', {
+        'fio': fio,
+        'phone': phone,
+        'email': email,
+        'hdn': createTable(totalData).innerHTML,
+    }).then((response) => {
+        console.log(response.data);
+    })
+
 })
 
 
@@ -332,8 +376,8 @@ function renderItem(title, data, updateChecked) {
         resetAll: function () {
             var _this = this;
             values.forEach(function (value) {
-              _this.update(0, value, true);
-          })
+                _this.update(0, value, true);
+            })
         },
 
         // initButton: function () {
@@ -519,3 +563,4 @@ function formattedPrice(response) {
 
     }, {})
 }
+
